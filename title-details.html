@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали аниме - AniChrono</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a2e;
+            --accent-coral: #ff6b6b;
+            --accent-turquoise: #4ecdc4;
+            --accent-gold: #ffe66d;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --dark-blue: #16213e;
+            --hot-pink: #e94560;
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .exo {
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--primary-bg), var(--secondary-bg));
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-turquoise);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-coral);
+            text-shadow: 0 0 10px var(--accent-coral);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-coral);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+            box-shadow: 0 0 10px var(--accent-coral);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+
+        /* Anime Header */
+        .anime-header {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            backdrop-filter: blur(10px);
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .anime-poster {
+            width: 300px;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .anime-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .anime-poster:hover img {
+            transform: scale(1.05);
+        }
+
+        .anime-status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+        }
+
+        .anime-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .anime-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-coral), var(--accent-turquoise));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .anime-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(22, 33, 62, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .meta-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-coral);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .anime-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .genre-tag {
+            background: rgba(78, 205, 196, 0.2);
+            color: var(--accent-turquoise);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .genre-tag:hover {
+            background: rgba(78, 205, 196, 0.3);
+            transform: scale(1.05);
+        }
+
+        .anime-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .primary-btn {
+            background: linear-gradient(45deg, var(--accent-coral), var(--hot-pink));
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .secondary-btn {
+            background: rgba(78, 205, 196, 0.2);
+            color: var(--accent-turquoise);
+            border: 1px solid var(--accent-turquoise);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(78, 205, 196, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-coral);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Episodes List */
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .episode-card {
+            background: rgba(22, 33, 62, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .episode-card:hover {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: var(--accent-coral);
+            transform: translateY(-2px);
+        }
+
+        .episode-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-coral);
+            margin-bottom: 0.5rem;
+        }
+
+        .episode-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .episode-duration {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .review-card {
+            background: rgba(22, 33, 62, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-coral);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--accent-gold);
+        }
+
+        .review-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Recommendations */
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .recommendation-card {
+            background: rgba(22, 33, 62, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
+            border-color: var(--accent-coral);
+        }
+
+        .recommendation-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .recommendation-info {
+            padding: 1rem;
+        }
+
+        .recommendation-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .recommendation-rating {
+            display: flex;
+            align-items: center;
+            color: var(--accent-gold);
+            font-size: 0.8rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .anime-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .anime-poster {
+                width: 250px;
+                height: 333px;
+                margin: 0 auto;
+            }
+
+            .anime-title {
+                font-size: 2rem;
+            }
+
+            .anime-meta {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .episodes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendations-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-coral);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hot-pink);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="particles" id="particles-container"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <div class="orbitron text-2xl font-bold">
+                    <span style="color: var(--accent-coral);">Ani</span><span style="color: var(--accent-turquoise);">Chrono</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="index.html" class="nav-link">Главная</a>
+                    <a href="catalog.html" class="nav-link">Каталог</a>
+                    <a href="watch.html" class="nav-link">Смотреть</a>
+                    <a href="profile.html" class="nav-link">Профиль</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container mx-auto px-4">
+            <!-- Anime Header -->
+            <div class="anime-header fade-in">
+                <div class="anime-poster">
+                    <img src="resources/anime-attack-titan.png" alt="Attack on Titan" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDMwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMWExYTJlIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMjAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij7wn5CjPC90ZXh0Pgo8L3N2Zz4='">
+                    <div class="anime-status-badge">Завершен</div>
+                </div>
+                <div class="anime-info">
+                    <div>
+                        <h1 class="anime-title orbitron" id="anime-title">Attack on Titan</h1>
+                        <div class="anime-meta">
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-rating">9.1</div>
+                                <div class="meta-label">Рейтинг</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-year">2013</div>
+                                <div class="meta-label">Год</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-episodes">75</div>
+                                <div class="meta-label">Серий</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-duration">24 мин</div>
+                                <div class="meta-label">Длительность</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-status">Completed</div>
+                                <div class="meta-label">Статус</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value" id="anime-season">Spring</div>
+                                <div class="meta-label">Сезон</div>
+                            </div>
+                        </div>
+                        <div class="anime-genres" id="anime-genres">
+                            <span class="genre-tag">Action</span>
+                            <span class="genre-tag">Drama</span>
+                            <span class="genre-tag">Fantasy</span>
+                            <span class="genre-tag">Military</span>
+                            <span class="genre-tag">Supernatural</span>
+                        </div>
+                        <p class="anime-description" id="anime-description">
+                            В мире, где человечество находится на грани вымирания из-за гигантских человекоподобных существ - титанов, молодой солдат Эрен Йегер клянется уничтожить всех титанов после того, как они разрушают его родной город и убивают его мать.
+                        </p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn primary-btn" onclick="watchAnime(1)">
+                            <i class="fas fa-play"></i>
+                            Смотреть сейчас
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="toggleFavorite(1)">
+                            <i class="fas fa-heart"></i>
+                            В избранное
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="shareAnime()">
+                            <i class="fas fa-share"></i>
+                            Поделиться
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="downloadAnime()">
+                            <i class="fas fa-download"></i>
+                            Скачать
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episodes Section -->
+            <div class="content-section fade-in">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Эпизоды
+                </h2>
+                <div class="episodes-grid" id="episodes-grid">
+                    <div class="episode-card" onclick="watchEpisode(1)">
+                        <div class="episode-number">Эпизод 1</div>
+                        <div class="episode-title">To You, in 2000 Years</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                    <div class="episode-card" onclick="watchEpisode(2)">
+                        <div class="episode-number">Эпизод 2</div>
+                        <div class="episode-title">That Day</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                    <div class="episode-card" onclick="watchEpisode(3)">
+                        <div class="episode-number">Эпизод 3</div>
+                        <div class="episode-title">A Dim Light Amid Despair</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                    <div class="episode-card" onclick="watchEpisode(4)">
+                        <div class="episode-number">Эпизод 4</div>
+                        <div class="episode-title">The Night of the Closing Ceremony</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                    <div class="episode-card" onclick="watchEpisode(5)">
+                        <div class="episode-number">Эпизод 5</div>
+                        <div class="episode-title">First Battle</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                    <div class="episode-card" onclick="watchEpisode(6)">
+                        <div class="episode-number">Эпизод 6</div>
+                        <div class="episode-title">The World the Girl Saw</div>
+                        <div class="episode-duration">24 мин</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section fade-in">
+                <h2 class="section-title">
+                    <i class="fas fa-comments"></i>
+                    Отзывы
+                </h2>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">АФ</div>
+                            <div class="reviewer-name">Аниме Фан</div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span class="ml-2">9.5</span>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        Невероятное аниме! История захватывает с первой серии, персонажи глубоко проработаны, а анимация просто потрясающая. Один из лучших тайтлов в жанре.
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">КА</div>
+                            <div class="reviewer-name">Критик Аниме</div>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span class="ml-2">8.0</span>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        Отличная адаптация манги с мощной атмосферой и интересной концепцией. Некоторые моменты немного затянуты, но в целом это must-watch для фанатов жанра.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="content-section fade-in">
+                <h2 class="section-title">
+                    <i class="fas fa-thumbs-up"></i>
+                    Рекомендации
+                </h2>
+                <div class="recommendations-grid">
+                    <div class="recommendation-card" onclick="viewAnimeDetails(2)">
+                        <img src="resources/anime-demon-slayer.png" alt="Demon Slayer">
+                        <div class="recommendation-info">
+                            <div class="recommendation-title">Demon Slayer</div>
+                            <div class="recommendation-rating">
+                                <i class="fas fa-star mr-1"></i>
+                                8.7
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommendation-card" onclick="viewAnimeDetails(3)">
+                        <img src="resources/anime-hero-academia.png" alt="My Hero Academia">
+                        <div class="recommendation-info">
+                            <div class="recommendation-title">My Hero Academia</div>
+                            <div class="recommendation-rating">
+                                <i class="fas fa-star mr-1"></i>
+                                8.5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommendation-card" onclick="viewAnimeDetails(5)">
+                        <img src="resources/anime-jujutsu-kaisen.png" alt="Jujutsu Kaisen">
+                        <div class="recommendation-info">
+                            <div class="recommendation-title">Jujutsu Kaisen</div>
+                            <div class="recommendation-rating">
+                                <i class="fas fa-star mr-1"></i>
+                                8.8
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommendation-card" onclick="viewAnimeDetails(4)">
+                        <img src="resources/anime-ocean-adventure.png" alt="One Piece">
+                        <div class="recommendation-info">
+                            <div class="recommendation-title">One Piece</div>
+                            <div class="recommendation-rating">
+                                <i class="fas fa-star mr-1"></i>
+                                9.0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container mx-auto px-4">
+            <div class="orbitron text-lg font-bold mb-2">
+                <span style="color: var(--accent-coral);">Ani</span><span style="color: var(--accent-turquoise);">Chrono</span>
+            </div>
+            <p class="text-gray-400">&copy; 2025 AniChrono. Все права защищены. Мир аниме в ваших руках.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Title details page functionality
+        class TitleDetailsPage {
+            constructor() {
+                this.currentAnimeId = this.getAnimeIdFromUrl();
+                this.init();
+            }
+
+            init() {
+                this.initParticles();
+                this.loadAnimeData();
+                this.initEventListeners();
+            }
+
+            getAnimeIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('id') || '1';
+            }
+
+            initParticles() {
+                const container = document.getElementById('particles-container');
+                if (!container) return;
+
+                for (let i = 0; i < 40; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            loadAnimeData() {
+                if (window.aniChrono && window.aniChrono.animeData) {
+                    const anime = window.aniChrono.animeData.find(a => a.id == this.currentAnimeId);
+                    if (anime) {
+                        this.updateAnimeInfo(anime);
+                    }
+                }
+            }
+
+            updateAnimeInfo(anime) {
+                document.getElementById('anime-title').textContent = anime.title;
+                document.getElementById('anime-rating').textContent = anime.rating;
+                document.getElementById('anime-year').textContent = anime.year;
+                document.getElementById('anime-episodes').textContent = anime.episodes;
+                document.getElementById('anime-status').textContent = anime.status;
+                document.getElementById('anime-description').textContent = anime.description;
+
+                // Update genres
+                const genresContainer = document.getElementById('anime-genres');
+                genresContainer.innerHTML = anime.genre.map(genre => 
+                    `<span class="genre-tag">${genre}</span>`
+                ).join('');
+
+                // Update poster
+                const posterImg = document.querySelector('.anime-poster img');
+                if (posterImg && anime.image) {
+                    posterImg.src = anime.image;
+                }
+            }
+
+            initEventListeners() {
+                // Mobile menu
+                document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+                    alert('Mobile menu - coming soon!');
+                });
+
+                // Update action buttons
+                const favoriteBtn = document.querySelector('.action-btn[onclick*="toggleFavorite"]');
+                if (favoriteBtn) {
+                    favoriteBtn.onclick = () => toggleFavorite(this.currentAnimeId);
+                }
+
+                const watchBtn = document.querySelector('.action-btn[onclick*="watchAnime"]');
+                if (watchBtn) {
+                    watchBtn.onclick = () => watchAnime(this.currentAnimeId);
+                }
+            }
+        }
+
+        // Global functions
+        function watchAnime(animeId) {
+            window.location.href = `watch.html?id=${animeId}`;
+        }
+
+        function watchEpisode(episodeNumber) {
+            const animeId = new URLSearchParams(window.location.search).get('id') || '1';
+            window.location.href = `watch.html?id=${animeId}&episode=${episodeNumber}`;
+        }
+
+        function toggleFavorite(animeId) {
+            if (window.aniChrono) {
+                if (window.aniChrono.userData.favorites.includes(animeId)) {
+                    window.aniChrono.removeFromFavorites(animeId);
+                } else {
+                    window.aniChrono.addToFavorites(animeId);
+                }
+            }
+        }
+
+        function shareAnime() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'AniChrono - Смотрите аниме онлайн',
+                    text: 'Смотрю отличное аниме на AniChrono!',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    if (window.aniChrono) {
+                        window.aniChrono.showNotification('Ссылка скопирована в буфер обмена!');
+                    }
+                });
+            }
+        }
+
+        function downloadAnime() {
+            if (window.aniChrono) {
+                window.aniChrono.showNotification('Функция скачивания скоро будет доступна!');
+            }
+        }
+
+        function viewAnimeDetails(animeId) {
+            window.location.href = `title-details.html?id=${animeId}`;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            new TitleDetailsPage();
+            
+            // Initialize scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

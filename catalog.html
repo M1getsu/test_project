@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог - AniChrono</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a2e;
+            --accent-coral: #ff6b6b;
+            --accent-turquoise: #4ecdc4;
+            --accent-gold: #ffe66d;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --dark-blue: #16213e;
+            --hot-pink: #e94560;
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .exo {
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--primary-bg), var(--secondary-bg));
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-turquoise);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-coral);
+            text-shadow: 0 0 10px var(--accent-coral);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-coral);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+            box-shadow: 0 0 10px var(--accent-coral);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--accent-turquoise);
+            min-width: 80px;
+        }
+
+        .filter-select {
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-coral);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 25px;
+            color: var(--text-primary);
+            padding-right: 3rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-coral);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-coral);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--hot-pink);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 15px var(--accent-coral);
+        }
+
+        /* Results Section */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-count {
+            color: var(--accent-turquoise);
+            font-weight: 600;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sort-select {
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+
+        /* Anime Grid */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .anime-card {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-10px) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.3);
+            border-color: var(--accent-coral);
+        }
+
+        .anime-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+
+        .anime-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .anime-info {
+            padding: 1.5rem;
+        }
+
+        .anime-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .anime-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .anime-rating {
+            display: flex;
+            align-items: center;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .anime-year {
+            color: var(--accent-turquoise);
+            font-weight: 500;
+        }
+
+        .anime-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-ongoing {
+            background: rgba(78, 205, 196, 0.9);
+            color: var(--primary-bg);
+        }
+
+        .status-completed {
+            background: rgba(255, 230, 109, 0.9);
+            color: var(--primary-bg);
+        }
+
+        .status-movie {
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+        }
+
+        .anime-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .genre-tag {
+            background: rgba(78, 205, 196, 0.2);
+            color: var(--accent-turquoise);
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .genre-tag:hover {
+            background: rgba(78, 205, 196, 0.3);
+            transform: scale(1.05);
+        }
+
+        .anime-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .watch-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: linear-gradient(45deg, var(--accent-coral), var(--hot-pink));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .watch-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .favorite-btn {
+            padding: 0.75rem;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid var(--accent-coral);
+            border-radius: 25px;
+            color: var(--accent-coral);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 45px;
+        }
+
+        .favorite-btn:hover {
+            background: var(--accent-coral);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.favorited {
+            background: var(--accent-coral);
+            color: white;
+        }
+
+        /* Loading State */
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .skeleton-card {
+            background: rgba(26, 26, 46, 0.4);
+            border-radius: 15px;
+            overflow: hidden;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .skeleton-content {
+            padding: 1.5rem;
+        }
+
+        .skeleton-line {
+            height: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--accent-coral);
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .empty-description {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 10, 10, 0.95);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 107, 107, 0.2);
+            margin-top: 4rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-label {
+                min-width: auto;
+                margin-bottom: 0.5rem;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .catalog-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem 0;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-coral);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hot-pink);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="particles" id="particles-container"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <div class="orbitron text-2xl font-bold">
+                    <span style="color: var(--accent-coral);">Ani</span><span style="color: var(--accent-turquoise);">Chrono</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="index.html" class="nav-link">Главная</a>
+                    <a href="catalog.html" class="nav-link">Каталог</a>
+                    <a href="watch.html" class="nav-link">Смотреть</a>
+                    <a href="profile.html" class="nav-link">Профиль</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="text-center mb-8 fade-in">
+                <h1 class="orbitron text-4xl font-bold mb-4">
+                    <span style="color: var(--accent-coral);">Каталог</span> 
+                    <span style="color: var(--accent-turquoise);">Аниме</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Откройте для себя тысячи аниме с возможностью продвинутой фильтрации и персонализированных рекомендаций
+                </p>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section fade-in">
+                <div class="filter-group">
+                    <span class="filter-label">Поиск:</span>
+                    <div class="search-container">
+                        <input type="text" id="catalog-search" class="search-input" placeholder="Название аниме, жанр, персонаж...">
+                        <button class="search-btn" onclick="performCatalogSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Жанр:</span>
+                    <select id="genre-filter" class="filter-select">
+                        <option value="all">Все жанры</option>
+                        <option value="Action">Экшен</option>
+                        <option value="Adventure">Приключения</option>
+                        <option value="Comedy">Комедия</option>
+                        <option value="Drama">Драма</option>
+                        <option value="Fantasy">Фэнтези</option>
+                        <option value="Horror">Ужасы</option>
+                        <option value="Mystery">Мистика</option>
+                        <option value="Romance">Романтика</option>
+                        <option value="School">Школа</option>
+                        <option value="Sci-Fi">Фантастика</option>
+                        <option value="Slice of Life">Повседневность</option>
+                        <option value="Supernatural">Сверхъестественное</option>
+                        <option value="Thriller">Триллер</option>
+                    </select>
+
+                    <span class="filter-label">Год:</span>
+                    <select id="year-filter" class="filter-select">
+                        <option value="all">Все годы</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                        <option value="2018">2018</option>
+                        <option value="2017">2017</option>
+                        <option value="2016">2016</option>
+                        <option value="2015">2015</option>
+                        <option value="2014">2014</option>
+                        <option value="2013">2013</option>
+                        <option value="2012">2012</option>
+                        <option value="2011">2011</option>
+                        <option value="2010">2010</option>
+                    </select>
+
+                    <span class="filter-label">Статус:</span>
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">Все статусы</option>
+                        <option value="Ongoing">Онгоинг</option>
+                        <option value="Completed">Завершен</option>
+                        <option value="Movie">Фильм</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button id="reset-filters" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                        <i class="fas fa-refresh mr-2"></i>Сбросить фильтры
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Header -->
+            <div class="results-header fade-in">
+                <div class="results-count" id="results-count">Загрузка...</div>
+                <div class="sort-controls">
+                    <label class="text-gray-300">Сортировать по:</label>
+                    <select id="sort-filter" class="sort-select">
+                        <option value="popularity">Популярности</option>
+                        <option value="rating">Рейтингу</option>
+                        <option value="year">Году</option>
+                        <option value="title">Названию</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-grid" class="loading-grid fade-in">
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anime Grid -->
+            <div id="catalog-grid" class="catalog-grid hidden fade-in">
+                <!-- Anime cards will be populated here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="empty-title">Ничего не найдено</div>
+                <div class="empty-description">
+                    Попробуйте изменить параметры поиска или фильтры<br>
+                    Мы постоянно добавляем новые тайтлы в наш каталог
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container mx-auto px-4">
+            <div class="orbitron text-lg font-bold mb-2">
+                <span style="color: var(--accent-coral);">Ani</span><span style="color: var(--accent-turquoise);">Chrono</span>
+            </div>
+            <p class="text-gray-400">&copy; 2025 AniChrono. Все права защищены. Мир аниме в ваших руках.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Catalog specific functionality
+        class CatalogPage {
+            constructor() {
+                this.currentFilters = {
+                    genre: 'all',
+                    year: 'all',
+                    status: 'all',
+                    search: '',
+                    sort: 'popularity'
+                };
+                this.init();
+            }
+
+            init() {
+                this.initParticles();
+                this.initEventListeners();
+                this.loadCatalog();
+            }
+
+            initParticles() {
+                const container = document.getElementById('particles-container');
+                if (!container) return;
+
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            initEventListeners() {
+                // Filter change handlers
+                document.getElementById('genre-filter')?.addEventListener('change', (e) => {
+                    this.currentFilters.genre = e.target.value;
+                    this.loadCatalog();
+                });
+
+                document.getElementById('year-filter')?.addEventListener('change', (e) => {
+                    this.currentFilters.year = e.target.value;
+                    this.loadCatalog();
+                });
+
+                document.getElementById('status-filter')?.addEventListener('change', (e) => {
+                    this.currentFilters.status = e.target.value;
+                    this.loadCatalog();
+                });
+
+                document.getElementById('sort-filter')?.addEventListener('change', (e) => {
+                    this.currentFilters.sort = e.target.value;
+                    this.loadCatalog();
+                });
+
+                // Search handler
+                const searchInput = document.getElementById('catalog-search');
+                if (searchInput) {
+                    let searchTimeout;
+                    searchInput.addEventListener('input', (e) => {
+                        clearTimeout(searchTimeout);
+                        searchTimeout = setTimeout(() => {
+                            this.currentFilters.search = e.target.value;
+                            this.loadCatalog();
+                        }, 300);
+                    });
+                }
+
+                // Reset filters
+                document.getElementById('reset-filters')?.addEventListener('click', () => {
+                    this.resetFilters();
+                });
+
+                // Mobile menu
+                document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+                    alert('Mobile menu - coming soon!');
+                });
+            }
+
+            async loadCatalog() {
+                this.showLoading();
+                
+                // Simulate loading delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                if (window.aniChrono && window.aniChrono.animeData) {
+                    const filteredAnime = this.filterAndSortAnime(window.aniChrono.animeData);
+                    this.displayAnime(filteredAnime);
+                } else {
+                    // Fallback if main.js hasn't loaded yet
+                    this.loadFallbackCatalog();
+                }
+            }
+
+            filterAndSortAnime(animeData) {
+                let filtered = [...animeData];
+
+                // Apply filters
+                if (this.currentFilters.genre !== 'all') {
+                    filtered = filtered.filter(anime => 
+                        anime.genre.includes(this.currentFilters.genre)
+                    );
+                }
+
+                if (this.currentFilters.year !== 'all') {
+                    filtered = filtered.filter(anime => 
+                        anime.year.toString() === this.currentFilters.year
+                    );
+                }
+
+                if (this.currentFilters.status !== 'all') {
+                    filtered = filtered.filter(anime => 
+                        anime.status === this.currentFilters.status
+                    );
+                }
+
+                if (this.currentFilters.search) {
+                    const searchTerm = this.currentFilters.search.toLowerCase();
+                    filtered = filtered.filter(anime => 
+                        anime.title.toLowerCase().includes(searchTerm) ||
+                        anime.genre.some(genre => genre.toLowerCase().includes(searchTerm)) ||
+                        anime.description.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Apply sorting
+                switch (this.currentFilters.sort) {
+                    case 'rating':
+                        filtered.sort((a, b) => b.rating - a.rating);
+                        break;
+                    case 'year':
+                        filtered.sort((a, b) => b.year - a.year);
+                        break;
+                    case 'title':
+                        filtered.sort((a, b) => a.title.localeCompare(b.title));
+                        break;
+                    case 'popularity':
+                    default:
+                        filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+                        break;
+                }
+
+                return filtered;
+            }
+
+            displayAnime(animeList) {
+                this.hideLoading();
+                
+                const grid = document.getElementById('catalog-grid');
+                const emptyState = document.getElementById('empty-state');
+                const resultsCount = document.getElementById('results-count');
+
+                if (animeList.length === 0) {
+                    grid.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    resultsCount.textContent = 'Ничего не найдено';
+                } else {
+                    grid.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                    resultsCount.textContent = `Найдено: ${animeList.length} аниме`;
+                    
+                    grid.innerHTML = animeList.map(anime => this.createAnimeCard(anime)).join('');
+                    
+                    // Trigger fade-in animation
+                    setTimeout(() => {
+                        grid.classList.add('visible');
+                    }, 100);
+                }
+            }
+
+            createAnimeCard(anime) {
+                const genres = anime.genre.slice(0, 3).map(genre => 
+                    `<span class="genre-tag">${genre}</span>`
+                ).join('');
+
+                const statusClass = anime.status === 'Ongoing' ? 'status-ongoing' : 
+                                  anime.status === 'Completed' ? 'status-completed' : 
+                                  'status-movie';
+
+                const isFavorite = window.aniChrono && 
+                                 window.aniChrono.userData && 
+                                 window.aniChrono.userData.favorites && 
+                                 window.aniChrono.userData.favorites.includes(anime.id);
+
+                return `
+                    <div class="anime-card" data-anime-id="${anime.id}" onclick="viewAnimeDetails(${anime.id})">
+                        <div class="anime-status ${statusClass}">${anime.status}</div>
+                        <img src="${anime.image}" alt="${anime.title}" loading="lazy" 
+                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDMwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMWExYTJlIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMjAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij7wn5CjPC90ZXh0Pgo8L3N2Zz4='">
+                        <div class="anime-info">
+                            <h3 class="anime-title">${anime.title}</h3>
+                            <div class="anime-meta">
+                                <div class="anime-rating">
+                                    <i class="fas fa-star mr-1"></i>
+                                    ${anime.rating}
+                                </div>
+                                <div class="anime-year">${anime.year}</div>
+                            </div>
+                            <div class="anime-genres">${genres}</div>
+                            <div class="anime-description">${anime.description}</div>
+                            <div class="card-actions">
+                                <button class="watch-btn" onclick="event.stopPropagation(); watchAnime(${anime.id})">
+                                    <i class="fas fa-play mr-2"></i>Смотреть
+                                </button>
+                                <button class="favorite-btn ${isFavorite ? 'favorited' : ''}" 
+                                        onclick="event.stopPropagation(); toggleFavorite(${anime.id})"
+                                        data-tooltip="${isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}">
+                                    <i class="fas fa-heart${isFavorite ? '' : '-o'}"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            loadFallbackCatalog() {
+                // Fallback catalog if main.js hasn't loaded
+                const fallbackData = [
+                    {
+                        id: 1,
+                        title: "Attack on Titan",
+                        genre: ["Action", "Drama", "Fantasy"],
+                        year: 2013,
+                        rating: 9.1,
+                        status: "Completed",
+                        description: "В мире, где человечество находится на грани вымирания из-за гигантских человекоподобных существ - титанов...",
+                        image: "resources/anime-attack-titan.png",
+                        popularity: 95
+                    }
+                    // Add more fallback data as needed
+                ];
+
+                const filtered = this.filterAndSortAnime(fallbackData);
+                this.displayAnime(filtered);
+            }
+
+            showLoading() {
+                document.getElementById('loading-grid').classList.remove('hidden');
+                document.getElementById('catalog-grid').classList.add('hidden');
+                document.getElementById('empty-state').classList.add('hidden');
+            }
+
+            hideLoading() {
+                document.getElementById('loading-grid').classList.add('hidden');
+            }
+
+            resetFilters() {
+                this.currentFilters = {
+                    genre: 'all',
+                    year: 'all',
+                    status: 'all',
+                    search: '',
+                    sort: 'popularity'
+                };
+
+                // Reset form elements
+                document.getElementById('genre-filter').value = 'all';
+                document.getElementById('year-filter').value = 'all';
+                document.getElementById('status-filter').value = 'all';
+                document.getElementById('sort-filter').value = 'popularity';
+                document.getElementById('catalog-search').value = '';
+
+                this.loadCatalog();
+            }
+        }
+
+        // Global functions
+        function performCatalogSearch() {
+            const searchTerm = document.getElementById('catalog-search').value;
+            if (catalogPage) {
+                catalogPage.currentFilters.search = searchTerm;
+                catalogPage.loadCatalog();
+            }
+        }
+
+        // Initialize catalog page
+        let catalogPage;
+        document.addEventListener('DOMContentLoaded', function() {
+            catalogPage = new CatalogPage();
+            
+            // Initialize scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
